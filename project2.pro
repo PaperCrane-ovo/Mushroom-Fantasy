@@ -10,10 +10,12 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    wayPoint.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    waypoint.h
 
 FORMS += \
     mainwindow.ui
@@ -24,4 +26,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    photos.qrc
+    picture.qrc

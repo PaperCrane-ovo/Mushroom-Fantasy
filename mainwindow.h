@@ -2,13 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPaintEvent>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -17,5 +18,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 };
 #endif // MAINWINDOW_H
