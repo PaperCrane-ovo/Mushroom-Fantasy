@@ -3,11 +3,19 @@
 #include "qpainter.h"
 #include "waypoint.h"
 #include "towerposition.h"
+#include "enemy.h"
+#include "tower.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+#include <QTimer>
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), strength(100), money(1000), m_waves(0), win(false), lose(false) {
     ui->setupUi(this);
     addWayPoint();
     setTowerPos();
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(30);
+    QTimer::singleShot(300, this, SLOT(game_start()));
 }
 
 MainWindow::~MainWindow() {
@@ -15,6 +23,14 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::paintEvent(QPaintEvent*) {
+    if(win || lose) {
+            QString  result = win ? "YOU WIN" : "YOU LOST";
+            QPainter painter(this);
+            painter.setPen(Qt::red);
+            painter.drawText(rect(),Qt::AlignCenter, result);
+            return ;
+    }
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     QString path(":/images/images/background.png");
@@ -25,6 +41,12 @@ void MainWindow::paintEvent(QPaintEvent*) {
 
     foreach(const TowerPosition p, m_TowerPosition_list)
         p.draw(&painter);
+
+    foreach(const tower *t, m_tower_list)
+        t->draw(&painter);
+
+    foreach(const enemy *e, m_enemy_list)
+        e->draw(&painter);
 }
 
 void MainWindow::addWayPoint() {
@@ -57,10 +79,61 @@ void MainWindow::addWayPoint() {
 }
 
 void MainWindow::setTowerPos() {
-    QPoint pos[] = { QPoint(2498,-200), QPoint(226,98), QPoint(439,98), QPoint(3210,215),
-                    QPoint(186,215), QPoint(314,215), QPoint(105,321), QPoint(223,323), QPoint(365,319) };
+    QPoint pos[] = { QPoint(2498,-200), QPoint(826, 275), QPoint(2139, 275), QPoint(3210,215), QPoint(126, 275),
+                    QPoint(1486,275), QPoint(1714,870), QPoint(505,871), QPoint(1123,873), QPoint(-285,919), QPoint(1823, 1473) };
     int len = sizeof(pos) / sizeof(QPoint);
     for (int i = 0; i < len; ++i) {
         m_TowerPosition_list.append(pos[i]);
     }
 }
+
+void MainWindow::mousePressEvent(QMouseEvent *m) {
+    QPoint p = m->pos();
+    for (auto ii = m_TowerPosition_list.begin(); ii != m_TowerPosition_list.end(); ++ii) {
+        if (Qt::LeftButton == m->button()) {
+            if (ii->isValidPos(p) && !ii->hasTower()) {
+                tower *t = new tower(ii->getCenterPos(), this);
+                m_tower_list.append(t);
+                ii->setHasTower(true);
+                update();
+                break;
+            }
+        }
+    }
+}
+
+bool MainWindow::load_waves() {
+    if (m_waves >= 6)  return false;
+    int enemy_time[] = {100, 500, 600, 1000, 3000, 6000};
+    for (int i = 0; i < 6; ++i) {
+        wayPoint *s = m_wayPoint_list.first();
+        enemy *e = new enemy(s, this);
+        m_enemy_list.append(e);
+        QTimer::singleShot(enemy_time[i], e, SLOT(doActive()));
+    }
+    return true;
+}
+
+void MainWindow::game_start() {  load_waves();  }
+
+void MainWindow::update_map() {
+    foreach(enemy *e, m_enemy_list)
+        e->move();
+    update();
+}
+
+void MainWindow::hurted(int damage) {  strength -= damage;  }
+
+void MainWindow::award(int m) {  money += m;  }
+
+void MainWindow::remove_enemy(enemy *e) {
+    Q_ASSERT(e);
+    m_enemy_list.removeOne(e);
+    delete e;
+    if (m_enemy_list.empty()) {
+        ++m_waves;
+        if (!load_waves())  win = true;
+    }
+}
+
+QList<enemy *> MainWindow::get_enemy() {  return m_enemy_list;  }

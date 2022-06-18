@@ -3,5 +3,6 @@
         <file>images/background.png</file>
         <file>images/image1.png</file>
         <file>images/image2.png</file>
+        <file>images/enemy.png</file>
     </qresource>
 </RCC>
