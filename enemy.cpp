@@ -10,12 +10,12 @@
 #include <QString>
 #include <QVector2D>
 
-const QSize enemy::m_size(300, 400);
+const QSize enemy::m_size(330, 440);
 
 enemy::enemy(wayPoint *s, MainWindow *game, QString path) : QObject(0), m_game(game), m_pos(s->getPos()), m_path(path) {
     strength = 40;
     cur_strength = strength;
-    speed = 1;
+    speed = 50;
     active = false;
     m_goal_pos = s->getNextWayPoint();
 }
@@ -30,14 +30,14 @@ void enemy::draw(QPainter *p) const {
     if (!active)  return;
     p->save();
     static const int healthBarLen = m_size.width();
-    QPoint healthBarPos = m_pos + QPoint(-m_size.width() / 2, -m_size.height());
+    QPoint healthBarPos = m_pos + QPoint(-m_size.width() / 2, -m_size.height() / 2);
     p->setPen(Qt::NoPen);
     p->setBrush(Qt::red);
-    QRect healthBkgBarRect(healthBarPos, QSize(healthBarLen, 2));
+    QRect healthBkgBarRect(healthBarPos, QSize(healthBarLen, 20));
     p->drawRect(healthBkgBarRect);
 
     p->setBrush(Qt::green);
-    QRect healthBarRect(healthBarPos, QSize((double)cur_strength / strength * healthBarLen, 2));
+    QRect healthBarRect(healthBarPos, QSize((double)cur_strength / strength * healthBarLen, 20));
     p->drawRect(healthBarRect);
 
     QPoint tmp(m_pos.x() - m_size.width() / 2, m_pos.y() - m_size.height() / 2);

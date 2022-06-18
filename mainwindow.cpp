@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     addWayPoint();
     setTowerPos();
     QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(update_map()));
     timer->start(30);
     QTimer::singleShot(300, this, SLOT(game_start()));
 }
@@ -104,7 +104,7 @@ void MainWindow::mousePressEvent(QMouseEvent *m) {
 
 bool MainWindow::load_waves() {
     if (m_waves >= 6)  return false;
-    int enemy_time[] = {100, 500, 600, 1000, 3000, 6000};
+    int enemy_time[] = {100, 1000, 2000, 3500, 5000, 8000};
     for (int i = 0; i < 6; ++i) {
         wayPoint *s = m_wayPoint_list.first();
         enemy *e = new enemy(s, this);
