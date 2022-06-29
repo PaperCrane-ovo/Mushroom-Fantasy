@@ -1,139 +1,182 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "qpainter.h"
 #include "waypoint.h"
 #include "towerposition.h"
 #include "enemy.h"
-#include "tower.h"
 
 #include <QTimer>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), strength(100), money(1000), m_waves(0), win(false), lose(false) {
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    ,m_playerHp(5)
+    ,m_playerGold(1000),m_waves(0),m_gameWin(false),m_gameLose(false)
+{
     ui->setupUi(this);
     addWayPoint();
-    setTowerPos();
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update_map()));
-    timer->start(30);
-    QTimer::singleShot(300, this, SLOT(game_start()));
+    loadTowerPosition();
+    QTimer* timer=new QTimer(this);
+    connect(timer,SIGNAL(timeout()),this,SLOT(updateMap()));
+    timer->start(25);
+    QTimer::singleShot(1000,this,SLOT(gameStart()));
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
-
-void MainWindow::paintEvent(QPaintEvent*) {
-    if(win || lose) {
-            QString  result = win ? "YOU WIN" : "YOU LOST";
-            QPainter painter(this);
-            painter.setPen(Qt::red);
-            painter.drawText(rect(),Qt::AlignCenter, result);
-            return ;
-    }
-
+void MainWindow::paintEvent(QPaintEvent*)
+{
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    QString path(":/images/images/background.png");
-    painter.drawPixmap(0, 0, 3840, 1985, path);
-
-    foreach(const wayPoint *p, m_wayPoint_list)
-        p->draw(&painter);
-
-    foreach(const TowerPosition p, m_TowerPosition_list)
-        p.draw(&painter);
-
-    foreach(const tower *t, m_tower_list)
-        t->draw(&painter);
-
-    foreach(const enemy *e, m_enemy_list)
-        e->draw(&painter);
-}
-
-void MainWindow::addWayPoint() {
-    wayPoint *waypoint1 = new wayPoint(QPoint(390, 10));
-    m_wayPoint_list.append(waypoint1);
-
-    wayPoint *waypoint2 = new wayPoint(QPoint(390, 430));
-    waypoint1->setNextWayPoint(waypoint2);
-    m_wayPoint_list.append(waypoint2);
-
-    wayPoint * waypoint3 = new wayPoint(QPoint(3280, 430));
-    waypoint2->setNextWayPoint(waypoint3);
-    m_wayPoint_list.append(waypoint3);
-
-    wayPoint * waypoint4 = new wayPoint(QPoint(3280, 1030));
-    waypoint3->setNextWayPoint(waypoint4);
-    m_wayPoint_list.append(waypoint4);
-
-    wayPoint * waypoint5 = new wayPoint(QPoint(390, 1030));
-    waypoint4->setNextWayPoint(waypoint5);
-    m_wayPoint_list.append(waypoint5);
-
-    wayPoint * waypoint6 = new wayPoint(QPoint(390, 1592));
-    waypoint5->setNextWayPoint(waypoint6);
-    m_wayPoint_list.append(waypoint6);
-
-    wayPoint * waypoint7 = new wayPoint(QPoint(2600, 1592));
-    waypoint6->setNextWayPoint(waypoint7);
-    m_wayPoint_list.append(waypoint7);
-}
-
-void MainWindow::setTowerPos() {
-    QPoint pos[] = { QPoint(2498,-200), QPoint(826, 275), QPoint(2139, 275), QPoint(3210,215), QPoint(126, 275),
-                    QPoint(1486,275), QPoint(1714,870), QPoint(505,871), QPoint(1123,873), QPoint(-285,919), QPoint(1823, 1473) };
-    int len = sizeof(pos) / sizeof(QPoint);
-    for (int i = 0; i < len; ++i) {
-        m_TowerPosition_list.append(pos[i]);
+    QString path(":/images/map1.png");
+    if(m_gameLose||m_gameWin){
+        QString text=m_gameLose?"YOU LOST":"YOU WIN";
+        QPainter painter(this);
+        painter.setPen(Qt::red);
+        painter.drawText(rect(),Qt::AlignCenter,text);
+        return;
     }
+    painter.drawPixmap(0,0,970,728,path);
+    //drawPixmap的前四个参数代表的分别是，图片左上角的横坐标，图片左上角的纵坐标，图片的width，图片的height。我们一般把width和height，与图片的真实大小匹配起来
+    foreach(const wayPoint* waypoint,m_wayPointList)
+        waypoint->draw(&painter);
+
+    foreach(TowerPosition towerposition,m_towerPositionList)
+        if(!towerposition.hasTower())
+            towerposition.draw(&painter);
+
+    foreach(const Tower* tower,m_towerList)
+        tower->draw(&painter);
+    foreach(const Enemy* enemy,m_enemyList)
+        enemy->draw(&painter);
+    foreach(const Bullet* bullet,m_bulletList)
+        bullet->draw(&painter);
+    drawHp(&painter);
+    drawGold(&painter);
+    drawWaves(&painter);
+    if(!canBuyTower())
+        drawLackOfMoney(&painter);
 }
 
-void MainWindow::mousePressEvent(QMouseEvent *m) {
-    QPoint p = m->pos();
-    for (auto ii = m_TowerPosition_list.begin(); ii != m_TowerPosition_list.end(); ++ii) {
-        if (Qt::LeftButton == m->button()) {
-            if (ii->isValidPos(p) && !ii->hasTower()) {
-                tower *t = new tower(ii->getCenterPos(), this);
-                m_tower_list.append(t);
-                ii->setHasTower(true);
+void MainWindow::addWayPoint(){
+    wayPoint* waypoint1 = new wayPoint(QPoint(91, 1));
+    m_wayPointList.push_back(waypoint1);
+
+    wayPoint* waypoint2 = new wayPoint(QPoint(91, 151));
+    waypoint1->setNextWayPoint(waypoint2);
+    m_wayPointList.push_back(waypoint2);
+
+    wayPoint * waypoint3=new wayPoint(QPoint(824, 160));
+    waypoint2->setNextWayPoint(waypoint3);
+    m_wayPointList.push_back(waypoint3);
+
+    wayPoint * waypoint4=new wayPoint(QPoint(825, 370));
+    waypoint3->setNextWayPoint(waypoint4);
+    m_wayPointList.push_back(waypoint4);
+
+    wayPoint * waypoint5=new wayPoint(QPoint(96, 377));
+    waypoint4->setNextWayPoint(waypoint5);
+    m_wayPointList.push_back(waypoint5);
+
+    wayPoint * waypoint6=new wayPoint(QPoint(95, 577));
+    waypoint5->setNextWayPoint(waypoint6);
+    m_wayPointList.push_back(waypoint6);
+
+    wayPoint * waypoint7=new wayPoint(QPoint(765, 577));
+    waypoint6->setNextWayPoint(waypoint7);
+    m_wayPointList.push_back(waypoint7);
+}
+
+void MainWindow::loadTowerPosition(){
+    QPoint pos[]={
+        QPoint(180,238), QPoint(286, 238),
+        QPoint(398, 238), QPoint(518,238),
+        QPoint(638, 238), QPoint(740,238),
+        QPoint(638,64), QPoint(733,64),
+        QPoint(836,64), QPoint(914,64),
+        QPoint(913, 172),QPoint(913,287),
+        QPoint(184,460),QPoint(278,460),
+        QPoint(383,460),QPoint(465,460),QPoint(565,460)
+    };
+    int len = sizeof(pos)/sizeof(pos[0]);
+    for(int i=0;i<len;i++)
+        m_towerPositionList.push_back(pos[i]);
+}
+
+void MainWindow::mousePressEvent(QMouseEvent* event){
+    QPoint pressPos=event->pos();
+    auto it=m_towerPositionList.begin();
+    while(it!=m_towerPositionList.end()){
+        if(Qt::LeftButton==event->button()){
+            if(it->ContainPos(pressPos) && !(it->hasTower())&&canBuyTower()){
+                Tower* tower=new Tower(it->getPos(),this);
+                m_towerList.push_back(tower);
+                m_playerGold-=300;
+                it->setHasTower(true);
                 update();
                 break;
             }
         }
+        it++;
     }
 }
+void MainWindow::getHpDamaged(){m_playerHp-=1;if(m_playerHp<=0)m_gameLose=true;}
+void MainWindow::awardGold(){m_playerGold+=200;}
+void MainWindow::removeEnemy(Enemy* enemy){
+    Q_ASSERT(enemy);//断言,判断指针为真
+    m_enemyList.removeOne(enemy);
+    delete enemy;
+    if(m_enemyList.empty()){
+        m_waves++;
+        if(!loadWaves())m_gameWin=true;
+    }
+}
+QList<Enemy*> MainWindow::getEnemyList(){return m_enemyList;}
 
-bool MainWindow::load_waves() {
-    if (m_waves >= 6)  return false;
-    int enemy_time[] = {100, 1000, 2000, 3500, 5000, 8000};
-    for (int i = 0; i < 6; ++i) {
-        wayPoint *s = m_wayPoint_list.first();
-        enemy *e = new enemy(s, this);
-        m_enemy_list.append(e);
-        QTimer::singleShot(enemy_time[i], e, SLOT(doActive()));
+bool MainWindow::canBuyTower(){return m_playerGold>=300;}
+bool MainWindow::loadWaves(){
+    if(m_waves>=6)return false;
+    int enemyStartTime[]={1000,3000,5000,7000,9000,11000};
+    for(int i=0;i<6;i++){
+        wayPoint* startWayPoint;
+        startWayPoint=m_wayPointList.first();
+        Enemy* enemy=new Enemy(startWayPoint,this);
+        m_enemyList.push_back(enemy);
+        QTimer::singleShot(enemyStartTime[i],enemy,SLOT(doActive()));
     }
     return true;
 }
-
-void MainWindow::game_start() {  load_waves();  }
-
-void MainWindow::update_map() {
-    foreach(enemy *e, m_enemy_list)
-        e->move();
+void MainWindow::gameStart(){loadWaves();}
+void MainWindow::updateMap(){
+    foreach(Enemy* enemy,m_enemyList)
+        enemy->move();
+    foreach(Tower* tower,m_towerList)
+        tower->checkEnemyInRange();
     update();
 }
-
-void MainWindow::hurted(int damage) {  strength -= damage;  }
-
-void MainWindow::award(int m) {  money += m;  }
-
-void MainWindow::remove_enemy(enemy *e) {
-    Q_ASSERT(e);
-    m_enemy_list.removeOne(e);
-    delete e;
-    if (m_enemy_list.empty()) {
-        ++m_waves;
-        if (!load_waves())  win = true;
-    }
+void MainWindow::removeBullet(Bullet* bullet){m_bulletList.removeOne(bullet);}
+void MainWindow::addBullet(Bullet* bullet){m_bulletList.push_back(bullet);}
+void MainWindow::drawHp(QPainter*painter)const{
+    painter->save();
+    painter->setPen(Qt::red);
+    painter->drawText(QRect(30,30,141,39),QString("HP:%1").arg(m_playerHp));
+    painter->restore();
 }
-
-QList<enemy *> MainWindow::get_enemy() {  return m_enemy_list;  }
+void MainWindow::drawGold(QPainter* painter)const{
+    painter->save();
+    painter->setPen(Qt::red);
+    painter->drawText(QRect(313,30,141,39),QString("Gold:%1").arg(m_playerGold));
+    painter->restore();
+}
+void MainWindow::drawWaves(QPainter* painter)const{
+    painter->save();
+    painter->setPen(Qt::red);
+    painter->drawText(QRect(558,30,141,39),QString("Waves:%1").arg(m_waves));
+    painter->restore();
+}
+void MainWindow::drawLackOfMoney(QPainter* painter)const{
+    painter->save();
+    painter->setPen(Qt::red);
+    painter->drawText(QRect(785,30,141,39),QString("金钱不足!"));
+    painter->restore();
+}

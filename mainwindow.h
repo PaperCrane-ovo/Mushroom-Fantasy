@@ -1,54 +1,66 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QPaintEvent>
-#include <QMouseEvent>
-
-#include "waypoint.h"
+#include <QPainter>
 #include "towerposition.h"
+#include "waypoint.h"
+#include <QMouseEvent>
 #include "tower.h"
 #include "enemy.h"
-
+#include "bullet.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class wayPoint;
-class tower;
-class enemy;
+class Tower;
+class Enemy;
+class Bullet;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
+protected:
+    void paintEvent(QPaintEvent*);
+    void mousePressEvent(QMouseEvent*);
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void addWayPoint();  //添加航点
-    void setTowerPos();
-    void hurted(int damage);  //基地受到伤害
-    void award(int m);
-    void remove_enemy(enemy *e);
-    QList<enemy *> get_enemy();
-    bool load_waves();
+    void addWayPoint();//添加航点
+    void loadTowerPosition();//加载防御塔坑
+
+    void getHpDamaged();
+    void awardGold();//敌人死亡奖励
+    void removeEnemy(Enemy* enemy);
+    QList<Enemy*> getEnemyList();
+
+    void removeBullet(Bullet* bullet);
+    void addBullet(Bullet* bullet);
+
+    bool loadWaves();
+    void drawHp(QPainter* painter)const;
+    void drawGold(QPainter* painter)const;
+    void drawWaves(QPainter* painter)const;
+    void drawLackOfMoney(QPainter* painter)const;
+    bool canBuyTower();
 
 private:
     Ui::MainWindow *ui;
-    QList<wayPoint*> m_wayPoint_list;
-    QList<TowerPosition> m_TowerPosition_list;
-    QList<tower *> m_tower_list;
-    QList<enemy *> m_enemy_list;
-    int strength;
-    int money;
+    QList<wayPoint*> m_wayPointList;//存储航点
+    QList<TowerPosition> m_towerPositionList;//存储防御塔坑打的list
+    QList<Tower*> m_towerList;
+    QList<Bullet*> m_bulletList;
+    QList<Enemy*>m_enemyList;
+    int m_playerHp;//初始生命值
+    int m_playerGold;//初始金钱
+
     int m_waves;
-    bool win, lose;
-
+    bool m_gameWin,m_gameLose;
 private slots:
-    void update_map();
-    void game_start();
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *);
+    void updateMap();
+    void gameStart();
 };
 #endif // MAINWINDOW_H

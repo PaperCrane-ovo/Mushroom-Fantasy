@@ -1,24 +1,32 @@
-#ifndef TOWERPOSITION_H
+﻿#ifndef TOWERPOSITION_H
 #define TOWERPOSITION_H
 
 #include <QSize>
 #include <QPainter>
 #include <QString>
 
-class TowerPosition {
+class TowerPosition{
 public:
-    TowerPosition(QPoint pos, QString path = (":/images/images/image2.png"));
-    QPoint getCenterPos();  //找到防御塔的中心点
-    QPoint getPos();  //得到防御塔坑的左上角
-    bool isValidPos(QPoint pos); //判断pos是否在防御塔坑的范围内
-    void draw(QPainter *p) const;
-    bool hasTower(); //判断坑里是否有塔
-    void setHasTower(bool hasTower = true);
+    TowerPosition(QPoint pos, QString path = (":/images/towerdir.png"));
+    QPoint getCenterPos();//防御塔坑中心点
+    QPoint getPos();
+
+    bool ContainPos(QPoint pos);//判断pos是否在防御塔坑的范围内
+
+    void draw(QPainter* painter)const;
+
+    bool hasTower();//判定是否有防御塔
+
+    void setHasTower(bool hasTower = true);//设置是否有防御塔
+
 private:
     QPoint m_pos;
     QString m_path;
+
     bool m_hasTower;
-    static const QSize m_size; //固定的防御塔坑的大小
+    static const QSize m_fixedSize;
 };
+
+
 
 #endif // TOWERPOSITION_H

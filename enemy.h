@@ -1,6 +1,7 @@
-#ifndef ENEMY_H
+﻿#ifndef ENEMY_H
 #define ENEMY_H
 
+#include <QObject>
 #include <QPoint>
 #include <QString>
 #include <QPainter>
@@ -8,40 +9,44 @@
 
 #include "waypoint.h"
 #include "mainwindow.h"
+#include "tower.h"
 
 class MainWindow;
-class tower;
+class Tower;
+class QPainter;
+class wayPoint;
 
-class enemy: public QObject {
-    Q_OBJECT
+class Enemy:public QObject{
+     Q_OBJECT;
 public:
-    enemy(wayPoint *s, MainWindow *game, QString path = ":/images/images/enemy.png");
-    ~enemy();
-    void draw(QPainter *p) const;
+    Enemy(wayPoint* startPoint,MainWindow* game,QString path=":/images/enemy1.png");
+    ~Enemy();
+    void draw(QPainter* painter)const;
+    void move();
+
     QPoint getPos();
 
-    void move();  //敌人移动
-    void attacked(tower *t);  //被防御塔攻击
-    void hurted(int damage);
-    void defeated();  //敌人死亡
-    void out_of_range(tower *t);  //脱离攻击范围
+    void getAttacked(Tower* tower);
+    void getDamaged(int damage);
+    void getRemoved();
+    void getLostSight(Tower* tower);
 
 private slots:
-    void doActive(); //私有信号槽(?)，敌人是否可以移动
+    void doActive();//是否可以移动
 
 private:
-    int strength;  //最大生命值
-    int cur_strength;  //当前生命值
-    int speed; //移动速度
-    bool active;  //是否可以移动
+    int m_maxHp;
+    int m_currentHp;
+    int m_walkingSpeed;
+    bool m_active;
 
-    wayPoint *m_goal_pos;
-    MainWindow *m_game;
+    wayPoint* m_destinationWayPoint;
+    MainWindow* m_game;
     QPoint m_pos;
     QString m_path;
-    QList<tower *> atker_tower;  //正在攻击自己的防御塔
+    QList<Tower* >m_attackerTowerList;
 
-    static const QSize m_size;
+    static const QSize m_fixedSize;
 };
 
 #endif // ENEMY_H
