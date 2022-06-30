@@ -5,6 +5,7 @@
 
 wayPoint::wayPoint(QPoint pos):m_pos(pos),m_nextWayPoint(NULL){}
 
+
 void wayPoint::setNextWayPoint(wayPoint* nextWayPoint){
     m_nextWayPoint= nextWayPoint;
 }
