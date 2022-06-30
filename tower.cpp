@@ -8,16 +8,16 @@
 const QSize Tower::m_size(100,154);
 Tower::Tower(){}
 Tower::~Tower(){
-    delete m_fireRateTimer;
-    m_fireRateTimer=NULL;
+    delete m_fireTimer;
+    m_fireTimer=NULL;
     m_game=NULL;m_attackedEnemy=NULL;
     delete m_attackedEnemy;
 
 }
 Tower::Tower(QPoint pos,int damage,int fireRate,MainWindow* game,QString path):m_pos(pos),m_path(path),m_attackRange(150),m_game(game),
     m_attackedEnemy(NULL),m_damage(damage),m_fireRate(fireRate){
-    m_fireRateTimer=new QTimer(this);
-    connect(m_fireRateTimer,SIGNAL(timeout()),this,SLOT(shootWeapon()));
+    m_fireTimer=new QTimer(this);
+    connect(m_fireTimer,SIGNAL(timeout()),this,SLOT(shootBullet()));
 }
 void Tower::draw(QPainter *painter)const{
     painter->save();
@@ -29,8 +29,8 @@ void Tower::chooseEnemyToAttack(Enemy* enemy){
     m_attackedEnemy=enemy;
     attackEnemy();
 }
-void Tower::attackEnemy(){m_fireRateTimer->start(m_fireRate);}
-void Tower::shootWeapon(){
+void Tower::attackEnemy(){m_fireTimer->start(m_fireRate);}
+void Tower::shootBullet(){
     Bullet* bullet=new Bullet(m_pos,m_attackedEnemy->getPos(),m_damage,m_attackedEnemy,m_game);
     m_game->addBullet(bullet);
     bullet->move();
@@ -39,7 +39,7 @@ void Tower::shootWeapon(){
 void Tower::targetKilled(){
     if(m_attackedEnemy)
         m_attackedEnemy=NULL;
-    m_fireRateTimer->stop();
+    m_fireTimer->stop();
 }
 void Tower::towerLoseSight(){
     targetKilled();

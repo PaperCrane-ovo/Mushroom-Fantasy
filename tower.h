@@ -1,4 +1,4 @@
-﻿#ifndef TOWER_H
+#ifndef TOWER_H
 #define TOWER_H
 #include <QObject>
 #include <QPoint>
@@ -35,9 +35,9 @@ class Tower:QObject{
         Enemy* m_attackedEnemy;
         int m_damage;
         int m_fireRate;
-        QTimer* m_fireRateTimer;
+        QTimer* m_fireTimer;
 private slots:
-        void shootWeapon();
+        void shootBullet();
 };
 
 #endif // TOWER_H

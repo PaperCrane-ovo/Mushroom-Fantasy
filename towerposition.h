@@ -1,4 +1,4 @@
-﻿#ifndef TOWERPOSITION_H
+#ifndef TOWERPOSITION_H
 #define TOWERPOSITION_H
 #include <QSize>
 #include <QPainter>
@@ -6,7 +6,6 @@
 class TowerPos{
 public:
     TowerPos(QPoint pos, QString path = (":/images/towerdir.png"));
-    QPoint getCenterPos();//防御塔坑中心点
     QPoint getPos();
     bool containPos(QPoint pos);//判断pos是否在防御塔坑的范围
     void draw(QPainter* painter)const;

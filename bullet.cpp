@@ -1,4 +1,4 @@
-﻿#include "bullet.h"
+#include "bullet.h"
 #include "mainwindow.h"
 #include "tower.h"
 #include "enemy.h"
@@ -15,7 +15,7 @@ Bullet::Bullet(QPoint start,QPoint target,int damage,Enemy* targetEnemy,MainWind
     :m_curPos(start),m_startPos(start),m_targetPos(target),m_damage(damage),m_path(path),m_targetEnemy(targetEnemy),m_game(game){}
 QPoint Bullet::getCurPos(){return m_curPos;}
 void Bullet::setCurPos(QPoint curPos){m_curPos=curPos;}
-void Bullet::move(){
+void Bullet::move(){//使用qpropertyanimation类制作子弹动画
     static int hitTime=100;
     QPropertyAnimation* animation=new QPropertyAnimation(this,"m_curPos");
     animation->setDuration(hitTime);
@@ -24,7 +24,7 @@ void Bullet::move(){
     connect(animation,SIGNAL(finished()),this,SLOT(hitTarget()));
     animation->start();
 }
-void Bullet::hitTarget(){
+void Bullet::hitTarget(){//子弹击中目标后
     if(m_game->getEnemyList().indexOf(m_targetEnemy)!=-1)
         m_targetEnemy->getDamaged(m_damage);
     m_game->removeBullet(this);
