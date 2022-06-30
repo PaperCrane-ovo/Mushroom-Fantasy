@@ -11,7 +11,7 @@ public:
     QPoint getCenterPos();//防御塔坑中心点
     QPoint getPos();
 
-    bool ContainPos(QPoint pos);//判断pos是否在防御塔坑的范围内
+    bool containPos(QPoint pos);//判断pos是否在防御塔坑的范围内
 
     void draw(QPainter* painter)const;
 
@@ -24,7 +24,7 @@ private:
     QString m_path;
 
     bool m_hasTower;
-    static const QSize m_fixedSize;
+    static const QSize m_size;
 };
 
 

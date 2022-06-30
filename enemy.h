@@ -44,9 +44,8 @@ private:
     MainWindow* m_game;
     QPoint m_pos;
     QString m_path;
-    QList<Tower* >m_attackerTowerList;
 
-    static const QSize m_fixedSize;
+    static const QSize m_size;
 };
 
 #endif // ENEMY_H

@@ -30,13 +30,12 @@ class Tower:QObject{
         QString m_path;//防御塔图片的路径
 
         int m_attackRange;//攻击范围
-        static const QSize m_fixedSize;//防御塔图片的固定大小
+        static const QSize m_size;//防御塔图片的固定大小
         MainWindow * m_game;//指向mainwindow的指针
         Enemy* m_attackedEnemy;
-        bool m_attacking;
         int m_damage;
         int m_fireRate;
-        QTimer* m_fireRateTime;
+        QTimer* m_fireRateTimer;
 private slots:
         void shootWeapon();
 };

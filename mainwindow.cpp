@@ -3,6 +3,7 @@
 #include "waypoint.h"
 #include "towerposition.h"
 #include "enemy.h"
+#include "paths.h"
 
 #include <QTimer>
 
@@ -10,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     ,m_playerHp(5)
-    ,m_playerGold(1000),m_waves(0),m_gameWin(false),m_gameLose(false)
+    ,m_playerGold(300),m_waves(0),m_gameWin(false),m_gameLose(false)
 {
     ui->setupUi(this);
     addWayPoint();
@@ -108,8 +109,9 @@ void MainWindow::mousePressEvent(QMouseEvent* event){
     auto it=m_towerPositionList.begin();
     while(it!=m_towerPositionList.end()){
         if(Qt::LeftButton==event->button()){
-            if(it->ContainPos(pressPos) && !(it->hasTower())&&canBuyTower()){
-                Tower* tower=new Tower(it->getPos(),this);
+            if(it->containPos(pressPos) && !(it->hasTower())&&canBuyTower()){
+                srand(time(0));
+                Tower* tower=new Tower(it->getPos(),this,towerPaths[rand()%2]);
                 m_towerList.push_back(tower);
                 m_playerGold-=300;
                 it->setHasTower(true);
@@ -135,14 +137,14 @@ QList<Enemy*> MainWindow::getEnemyList(){return m_enemyList;}
 
 bool MainWindow::canBuyTower(){return m_playerGold>=300;}
 bool MainWindow::loadWaves(){
-    if(m_waves>=6)return false;
-    int enemyStartTime[]={1000,3000,5000,7000,9000,11000};
-    for(int i=0;i<6;i++){
+    srand(time(0));
+    if(m_waves>=12)return false;
+    for(int i=0;i<=m_waves;i++){
         wayPoint* startWayPoint;
         startWayPoint=m_wayPointList.first();
-        Enemy* enemy=new Enemy(startWayPoint,this);
+        Enemy* enemy=new Enemy(startWayPoint,this,enemyPaths[rand()%3]);
         m_enemyList.push_back(enemy);
-        QTimer::singleShot(enemyStartTime[i],enemy,SLOT(doActive()));
+        QTimer::singleShot(i*1500+1000,enemy,SLOT(doActive()));
     }
     return true;
 }

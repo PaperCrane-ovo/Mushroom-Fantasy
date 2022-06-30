@@ -9,7 +9,7 @@
 #include <QSize>
 #include <QString>
 #include <QPropertyAnimation>
-const QSize Bullet::m_fixedSize(5,5);
+const QSize Bullet::m_size(5,5);
 Bullet::Bullet(){}
 Bullet::Bullet(QPoint start,QPoint target,int damage,Enemy* targetEnemy,MainWindow* game,QString path)
     :m_curPos(start),m_startPos(start),m_targetPos(target),m_damage(damage),m_path(path),m_targetEnemy(targetEnemy),m_game(game){}

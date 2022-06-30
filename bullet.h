@@ -39,7 +39,7 @@ private:
     Enemy* m_targetEnemy;
     MainWindow* m_game;
 
-    static const QSize m_fixedSize;//子弹大小
+    static const QSize m_size;//子弹大小
 
 };
 

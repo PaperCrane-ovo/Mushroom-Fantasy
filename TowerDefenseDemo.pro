@@ -20,6 +20,7 @@ SOURCES += \
 HEADERS += \
     bullet.h \
     enemy.h \
+    paths.h \
     tower.h \
     towerposition.h \
     mainwindow.h \

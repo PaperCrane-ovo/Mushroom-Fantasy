@@ -6,5 +6,8 @@
         <file>images/map1.png</file>
         <file>images/tower1.png</file>
         <file>images/towerdir.png</file>
+        <file>images/tower2.png</file>
+        <file>images/enemy2.png</file>
+        <file>images/enemy3.png</file>
     </qresource>
 </RCC>
