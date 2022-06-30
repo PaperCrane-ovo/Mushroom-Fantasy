@@ -21,9 +21,10 @@ class Tower:QObject{
         void targetKilled();
         void chooseEnemyToAttack(Enemy* enemy);
         void removeBullet();
-        void loseSightOfEnemy();
+        void towerLoseSight();
         void checkEnemyInRange();
         Enemy* getEnemyBeingAttacked();
+        void setEnemyBeingAttacked(Enemy* enemy);
         void draw(QPainter * painter)const;//画出防御塔
     private:
         QPoint m_pos;//防御塔的中心点

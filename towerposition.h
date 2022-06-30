@@ -3,9 +3,9 @@
 #include <QSize>
 #include <QPainter>
 #include <QString>
-class TowerPosition{
+class TowerPos{
 public:
-    TowerPosition(QPoint pos, QString path = (":/images/towerdir.png"));
+    TowerPos(QPoint pos, QString path = (":/images/towerdir.png"));
     QPoint getCenterPos();//防御塔坑中心点
     QPoint getPos();
     bool containPos(QPoint pos);//判断pos是否在防御塔坑的范围

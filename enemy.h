@@ -36,11 +36,11 @@ private slots:
 
 private:
     int m_maxHp;
-    int m_currentHp;
+    int m_curHp;
     int m_walkingSpeed;
     bool m_active;
 
-    wayPoint* m_destinationWayPoint;
+    wayPoint* m_destWayPoint;
     MainWindow* m_game;
     QPoint m_pos;
     QString m_path;

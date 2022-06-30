@@ -50,7 +50,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QList<wayPoint*> m_wayPointList;//存储航点
-    QList<TowerPosition> m_towerPositionList;//存储防御塔坑打的list
+    QList<TowerPos> m_towerPosList;//存储防御塔坑打的list
     QList<Tower*> m_towerList;
     QList<Bullet*> m_bulletList;
     QList<Enemy*>m_enemyList;

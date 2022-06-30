@@ -12,14 +12,14 @@
 
 const QSize Enemy::m_size(55,65);
 
-Enemy::Enemy(wayPoint* startWayPoint,int Hp,int walkingSpeed,MainWindow* game,QString path):
-    QObject(0),m_maxHp(Hp),m_walkingSpeed(walkingSpeed),m_game(game),m_pos(startWayPoint->getPos()),m_path(path){
-    m_currentHp=m_maxHp;
+Enemy::Enemy(wayPoint* firstWayPoint,int Hp,int walkingSpeed,MainWindow* game,QString path):
+    QObject(0),m_maxHp(Hp),m_walkingSpeed(walkingSpeed),m_game(game),m_pos(firstWayPoint->getPos()),m_path(path){
+    m_curHp=m_maxHp;
     m_active=false;
-    m_destinationWayPoint=startWayPoint->getNextWayPoint();
+    m_destWayPoint=firstWayPoint->getNextWayPoint();
 }
 Enemy::~Enemy(){
-    m_destinationWayPoint=NULL;
+    m_destWayPoint=NULL;
     m_game=NULL;
 }
 ///绘出enemy
@@ -38,7 +38,7 @@ void Enemy::draw(QPainter* painter)const{
     ///画出当前血量
     painter->setBrush(Qt::green);
     ///算出当前血量占比
-    QRect healthBarRect(healthBarPoint,QSize((double)m_currentHp/m_maxHp*healthBarWidth,2));
+    QRect healthBarRect(healthBarPoint,QSize((double)m_curHp/m_maxHp*healthBarWidth,2));
     painter->drawRect(healthBarRect);
     ///画敌人
     QPoint tmp(m_pos.x()-m_size.width()/2,m_pos.y()-m_size.height()/2);//得到图片左上点
@@ -48,10 +48,10 @@ void Enemy::draw(QPainter* painter)const{
 
 void Enemy::move(){
     if(!m_active)return;
-    if(isIncide(m_pos,1,m_destinationWayPoint->getPos(),1)){//到达目标航点
-        if(m_destinationWayPoint->getNextWayPoint()){
-            m_pos=m_destinationWayPoint->getPos();
-            m_destinationWayPoint=m_destinationWayPoint->getNextWayPoint();
+    if(isIncide(m_pos,1,m_destWayPoint->getPos(),1)){//到达目标航点
+        if(m_destWayPoint->getNextWayPoint()){
+            m_pos=m_destWayPoint->getPos();
+            m_destWayPoint=m_destWayPoint->getNextWayPoint();
 
         }
         else{
@@ -61,11 +61,11 @@ void Enemy::move(){
         }
     }
     else{
-        QPoint targetPoint  = m_destinationWayPoint->getPos();
-        double movementSpeed=m_walkingSpeed;
-        QVector2D normailzed(targetPoint-m_pos);
-        normailzed.normalize();
-        m_pos=m_pos+normailzed.toPoint()*movementSpeed;
+        QPoint targetPoint  = m_destWayPoint->getPos();
+        double speed=m_walkingSpeed;
+        QVector2D vector2d(targetPoint-m_pos);//长度归一化
+        vector2d.normalize();
+        m_pos=m_pos+vector2d.toPoint()*speed;
     }
 }
 
@@ -79,8 +79,8 @@ QPoint Enemy::getPos(){
 
 void Enemy::getDamaged(int damage)
 {
-    m_currentHp-=damage;
-    if(m_currentHp<=0)
+    m_curHp-=damage;
+    if(m_curHp<=0)
     {
         m_game->awardGold();
         getRemoved();

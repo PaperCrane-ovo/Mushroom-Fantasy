@@ -41,7 +41,7 @@ void MainWindow::paintEvent(QPaintEvent*)
     foreach(const wayPoint* waypoint,m_wayPointList)
         waypoint->draw(&painter);
 
-    foreach(TowerPosition towerposition,m_towerPositionList)
+    foreach(TowerPos towerposition,m_towerPosList)
         if(!towerposition.hasTower())
             towerposition.draw(&painter);
 
@@ -100,15 +100,16 @@ void MainWindow::loadTowerPosition(){
     };
     int len = sizeof(pos)/sizeof(pos[0]);
     for(int i=0;i<len;i++)
-        m_towerPositionList.push_back(pos[i]);
+        m_towerPosList.push_back(pos[i]);
 }
 
 void MainWindow::mousePressEvent(QMouseEvent* event){
     QPoint pressPos=event->pos();
-    auto it=m_towerPositionList.begin();
-    while(it!=m_towerPositionList.end()){
+    auto it=m_towerPosList.begin();
+    while(it!=m_towerPosList.end()){
         if(Qt::LeftButton==event->button()){
-            if(it->containPos(pressPos) && !(it->hasTower())&&canBuyTower()){
+            if(it->containPos(pressPos) && !(it->hasTower())){
+                if(!canBuyTower())return;
                 srand(time(0));
                 Tower* tower=new Tower(it->getPos(),m_waves*1.5+10,1000-m_waves*15, this,towerPaths[rand()%2]);
                 m_towerList.push_back(tower);
@@ -125,6 +126,11 @@ void MainWindow::getHpDamaged(){m_playerHp-=1;if(m_playerHp<=0)m_gameLose=true;}
 void MainWindow::awardGold(){m_playerGold+=m_waves==0?350:50;}
 void MainWindow::removeEnemy(Enemy* enemy){
     Q_ASSERT(enemy);//断言,判断指针为真
+    foreach(Tower* tower,m_towerList){
+        if(tower->getEnemyBeingAttacked()==enemy)
+            tower->targetKilled();
+    }
+
     m_enemyList.removeOne(enemy);
     delete enemy;
     if(m_enemyList.empty()){
@@ -139,9 +145,9 @@ bool MainWindow::loadWaves(){
     srand(time(0));
     if(m_waves>=12)return false;
     for(int i=0;i<=m_waves;i++){
-        wayPoint* startWayPoint;
-        startWayPoint=m_wayPointList.first();
-        Enemy* enemy=new Enemy(startWayPoint,40+exp(double(m_waves)),2+m_waves*0.1,this,enemyPaths[rand()%4]);
+        wayPoint* firstWayPoint;
+        firstWayPoint=m_wayPointList.first();
+        Enemy* enemy=new Enemy(firstWayPoint,40+exp(double(m_waves)),2+m_waves*0.1,this,enemyPaths[rand()%4]);
         m_enemyList.push_back(enemy);
         QTimer::singleShot(i*1500+1000,enemy,SLOT(doActive()));
     }

@@ -41,13 +41,13 @@ void Tower::targetKilled(){
         m_attackedEnemy=NULL;
     m_fireRateTimer->stop();
 }
-void Tower::loseSightOfEnemy(){
+void Tower::towerLoseSight(){
     targetKilled();
 }
 void Tower::checkEnemyInRange(){
     if(m_attackedEnemy){
         if(!isIncide(m_pos,m_attackRange,m_attackedEnemy->getPos(),1))
-            loseSightOfEnemy();
+            towerLoseSight();
     }
     else{
         QList<Enemy*> enemyList=m_game->getEnemyList();
@@ -59,3 +59,4 @@ void Tower::checkEnemyInRange(){
     }
 }
 Enemy* Tower::getEnemyBeingAttacked(){return m_attackedEnemy;}
+void Tower::setEnemyBeingAttacked(Enemy* enemy){m_attackedEnemy=enemy;}
