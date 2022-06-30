@@ -58,7 +58,7 @@ private:
     int m_playerGold;//初始金钱
 
     int m_waves;
-    bool m_gameWin,m_gameLose;
+    bool m_win,m_lose;
 private slots:
     void updateMap();
     void gameStart();

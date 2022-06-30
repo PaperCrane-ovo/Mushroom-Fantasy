@@ -1,4 +1,4 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "waypoint.h"
 #include "towerposition.h"
@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     ,m_playerHp(5)
-    ,m_playerGold(300),m_waves(0),m_gameWin(false),m_gameLose(false)
+    ,m_playerGold(300),m_waves(0),m_win(false),m_lose(false)
 {
     ui->setupUi(this);
     addWayPoint();
@@ -30,8 +30,8 @@ void MainWindow::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     QString path(":/images/map1.png");
-    if(m_gameLose||m_gameWin){
-        QString path(m_gameLose?WinOrLossPaths["lose"]:WinOrLossPaths["win"]);
+    if(m_lose||m_win){
+        QString path(m_lose?WinOrLossPaths["lose"]:WinOrLossPaths["win"]);
         QPainter painter(this);
         painter.drawPixmap(0,0,970,728,path);
         return;
@@ -122,7 +122,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event){
         it++;
     }
 }
-void MainWindow::getHpDamaged(){m_playerHp-=1;if(m_playerHp<=0)m_gameLose=true;}
+void MainWindow::getHpDamaged(){m_playerHp-=1;if(m_playerHp<=0)m_lose=true;}
 void MainWindow::awardGold(){m_playerGold+=m_waves==0?350:50;}
 void MainWindow::removeEnemy(Enemy* enemy){
     Q_ASSERT(enemy);//断言,判断指针为真
@@ -135,7 +135,7 @@ void MainWindow::removeEnemy(Enemy* enemy){
     delete enemy;
     if(m_enemyList.empty()){
         m_waves++;
-        if(!loadWaves())m_gameWin=true;
+        if(!loadWaves())m_win=true;
     }
 }
 QList<Enemy*> MainWindow::getEnemyList(){return m_enemyList;}
@@ -147,7 +147,7 @@ bool MainWindow::loadWaves(){
     for(int i=0;i<=m_waves;i++){
         wayPoint* firstWayPoint;
         firstWayPoint=m_wayPointList.first();
-        Enemy* enemy=new Enemy(firstWayPoint,40+exp(double(m_waves)),2+m_waves*0.1,this,enemyPaths[rand()%4]);
+        Enemy* enemy=new Enemy(firstWayPoint,40+exp(double(m_waves*0.5)),2+m_waves*0.1,this,enemyPaths[rand()%4]);
         m_enemyList.push_back(enemy);
         QTimer::singleShot(i*1500+1000,enemy,SLOT(doActive()));
     }
