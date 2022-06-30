@@ -14,8 +14,8 @@ Tower::~Tower(){
     delete m_attackedEnemy;
 
 }
-Tower::Tower(QPoint pos,MainWindow* game,QString path):m_pos(pos),m_path(path),m_attackRange(150),m_game(game),
-    m_attackedEnemy(NULL),m_damage(10),m_fireRate(1000){
+Tower::Tower(QPoint pos,int damage,int fireRate,MainWindow* game,QString path):m_pos(pos),m_path(path),m_attackRange(150),m_game(game),
+    m_attackedEnemy(NULL),m_damage(damage),m_fireRate(fireRate){
     m_fireRateTimer=new QTimer(this);
     connect(m_fireRateTimer,SIGNAL(timeout()),this,SLOT(shootWeapon()));
 }

@@ -4,7 +4,7 @@
 #include "towerposition.h"
 #include "enemy.h"
 #include "paths.h"
-
+#include <cmath>
 #include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -31,10 +31,9 @@ void MainWindow::paintEvent(QPaintEvent*)
     QPainter painter(this);
     QString path(":/images/map1.png");
     if(m_gameLose||m_gameWin){
-        QString text=m_gameLose?"YOU LOST":"YOU WIN";
+        QString path(m_gameLose?WinOrLossPaths["lose"]:WinOrLossPaths["win"]);
         QPainter painter(this);
-        painter.setPen(Qt::red);
-        painter.drawText(rect(),Qt::AlignCenter,text);
+        painter.drawPixmap(0,0,970,728,path);
         return;
     }
     painter.drawPixmap(0,0,970,728,path);
@@ -111,9 +110,9 @@ void MainWindow::mousePressEvent(QMouseEvent* event){
         if(Qt::LeftButton==event->button()){
             if(it->containPos(pressPos) && !(it->hasTower())&&canBuyTower()){
                 srand(time(0));
-                Tower* tower=new Tower(it->getPos(),this,towerPaths[rand()%2]);
+                Tower* tower=new Tower(it->getPos(),m_waves*1.5+10,1000-m_waves*15, this,towerPaths[rand()%2]);
                 m_towerList.push_back(tower);
-                m_playerGold-=300;
+                m_playerGold-=300+int(m_waves*0.8);
                 it->setHasTower(true);
                 update();
                 break;
@@ -123,7 +122,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event){
     }
 }
 void MainWindow::getHpDamaged(){m_playerHp-=1;if(m_playerHp<=0)m_gameLose=true;}
-void MainWindow::awardGold(){m_playerGold+=200;}
+void MainWindow::awardGold(){m_playerGold+=m_waves==0?350:50;}
 void MainWindow::removeEnemy(Enemy* enemy){
     Q_ASSERT(enemy);//断言,判断指针为真
     m_enemyList.removeOne(enemy);
@@ -135,14 +134,14 @@ void MainWindow::removeEnemy(Enemy* enemy){
 }
 QList<Enemy*> MainWindow::getEnemyList(){return m_enemyList;}
 
-bool MainWindow::canBuyTower(){return m_playerGold>=300;}
+bool MainWindow::canBuyTower(){return m_playerGold>=300+m_waves*0.8;}
 bool MainWindow::loadWaves(){
     srand(time(0));
     if(m_waves>=12)return false;
     for(int i=0;i<=m_waves;i++){
         wayPoint* startWayPoint;
         startWayPoint=m_wayPointList.first();
-        Enemy* enemy=new Enemy(startWayPoint,this,enemyPaths[rand()%3]);
+        Enemy* enemy=new Enemy(startWayPoint,40+exp(double(m_waves)),2+m_waves*0.1,this,enemyPaths[rand()%4]);
         m_enemyList.push_back(enemy);
         QTimer::singleShot(i*1500+1000,enemy,SLOT(doActive()));
     }
@@ -156,7 +155,7 @@ void MainWindow::updateMap(){
         tower->checkEnemyInRange();
     update();
 }
-void MainWindow::removeBullet(Bullet* bullet){m_bulletList.removeOne(bullet);}
+void MainWindow::removeBullet(Bullet* bullet){m_bulletList.removeOne(bullet);delete bullet;}
 void MainWindow::addBullet(Bullet* bullet){m_bulletList.push_back(bullet);}
 void MainWindow::drawHp(QPainter*painter)const{
     painter->save();
@@ -173,7 +172,7 @@ void MainWindow::drawGold(QPainter* painter)const{
 void MainWindow::drawWaves(QPainter* painter)const{
     painter->save();
     painter->setPen(Qt::red);
-    painter->drawText(QRect(558,30,141,39),QString("Waves:%1").arg(m_waves));
+    painter->drawText(QRect(558,30,141,39),QString("Waves:%1").arg(m_waves+1));
     painter->restore();
 }
 void MainWindow::drawLackOfMoney(QPainter* painter)const{

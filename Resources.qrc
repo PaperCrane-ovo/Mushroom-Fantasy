@@ -9,5 +9,9 @@
         <file>images/tower2.png</file>
         <file>images/enemy2.png</file>
         <file>images/enemy3.png</file>
+        <file>images/enemy4.png</file>
+        <file>images/lose.png</file>
+        <file>images/win.png</file>
+        <file>images/begin.png</file>
     </qresource>
 </RCC>

@@ -14,7 +14,7 @@ class QTimer;
 class Tower:QObject{
     Q_OBJECT
     public:
-        Tower(QPoint pos,MainWindow * game,QString path=":/images/tower1.png");
+        Tower(QPoint pos,int damage,int fireRate,MainWindow * game,QString path=":/images/tower1.png");
         ~Tower();
         Tower();
         void attackEnemy();
@@ -28,7 +28,6 @@ class Tower:QObject{
     private:
         QPoint m_pos;//防御塔的中心点
         QString m_path;//防御塔图片的路径
-
         int m_attackRange;//攻击范围
         static const QSize m_size;//防御塔图片的固定大小
         MainWindow * m_game;//指向mainwindow的指针

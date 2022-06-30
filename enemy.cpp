@@ -12,11 +12,9 @@
 
 const QSize Enemy::m_size(55,65);
 
-Enemy::Enemy(wayPoint* startWayPoint,MainWindow* game,QString path):
-    QObject(0),m_game(game),m_pos(startWayPoint->getPos()),m_path(path){
-    m_maxHp=40;
+Enemy::Enemy(wayPoint* startWayPoint,int Hp,int walkingSpeed,MainWindow* game,QString path):
+    QObject(0),m_maxHp(Hp),m_walkingSpeed(walkingSpeed),m_game(game),m_pos(startWayPoint->getPos()),m_path(path){
     m_currentHp=m_maxHp;
-    m_walkingSpeed=2;
     m_active=false;
     m_destinationWayPoint=startWayPoint->getNextWayPoint();
 }

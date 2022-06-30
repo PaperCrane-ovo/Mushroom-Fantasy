@@ -19,7 +19,7 @@ class wayPoint;
 class Enemy:public QObject{
      Q_OBJECT;
 public:
-    Enemy(wayPoint* startPoint,MainWindow* game,QString path=":/images/enemy1.png");
+    Enemy(wayPoint* startPoint,int Hp,int walkingSpeed,MainWindow* game,QString path=":/images/enemy1.png");
     ~Enemy();
     void draw(QPainter* painter)const;
     void move();

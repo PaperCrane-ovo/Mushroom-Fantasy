@@ -13,6 +13,7 @@ SOURCES += \
     enemy.cpp \
     main.cpp \
     mainwindow.cpp \
+    menu.cpp \
     tower.cpp \
     towerposition.cpp \
     waypoint.cpp
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     bullet.h \
     enemy.h \
+    menu.h \
     paths.h \
     tower.h \
     towerposition.h \
@@ -28,7 +30,8 @@ HEADERS += \
     waypoint.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    menu.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
